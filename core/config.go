@@ -20,5 +20,18 @@ type Config struct {
 	}'json:"log"'
 }
 
+func (c *Config) Loads(conf string) error {
+	if f, err := os.Open(conf); err != nil {
+		return err
+	} else if s, err := ioutil.ReadAll(f); err != nil {
+		return err
+	} else if err := json.Unmarshal([]byte(s), c); err != nil {
+		return err
+	} else {
+		return c.Validate()
+	}
+}
+
+
 func (c *Config) validate() error {
 
