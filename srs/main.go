@@ -1,9 +1,9 @@
 package main
 
 import (
-	"core"
 	"flag"
 	"fmt"
+	"go-oryxd/core"
 	"os"
 )
 

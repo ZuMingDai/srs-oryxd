@@ -7,7 +7,7 @@ import (
 )
 
 func ServerRun(c *Config, callback func() int) int {
-	LogerTrace.Println("apply log tank", c.Log.Tank)
+	LoggerTrace.Println("apply log tank", c.Log.Tank)
 	LoggerTrace.Println("apply log level", c.Log.Level)
 	if c.LogToFile() {
 		LoggerTrace.Println("apply log file ", c.Log.File)
@@ -17,7 +17,7 @@ func ServerRun(c *Config, callback func() int) int {
 		} else {
 			defer func() {
 				err = f.Close()
-				LoggerWarn = log.new(os.Stderr, "[gsrs][warn]", log.LstdFlags)
+				LoggerWarn = log.New(os.Stderr, "[gsrs][warn]", log.LstdFlags)
 				if err != nil {
 					LoggerWarn.Println("gracefully close log file", c.Log.File, "failed, err is", err)
 				} else {
