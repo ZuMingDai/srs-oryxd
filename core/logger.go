@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-conts (
+const (
 	logLabel = "[gsrs]"
 	logInfoLabel = logLabel + "[info]"
 	logTraceLabel = logLabel + "[trace]"
@@ -27,6 +27,6 @@ var LoggerError Logger = log.New(Os.Stderr, logErrorLabel, log.LstdFlags)
 
 type Logger interface {
 	Print(a ...interface{})
-	PrintIn(a ...interface{})
+	Println(a ...interface{})
 	Printf(format string, a ...interface{})
 }
