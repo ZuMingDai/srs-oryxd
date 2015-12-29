@@ -12,7 +12,7 @@ import (
 //	--c conf/srs.json
 //	-c=conf/srs.json
 //	--c=conf/srs.json
-var conffile = *flag.String("c", "conf/srs.json", "the config file.")
+var conffile = *flag.String("c", "D:/mygo/src/go-oryxd/conf/srs.json", "the config file.")
 
 func run() int {
 	core.LoggerTrace.Println(fmt.Sprintf("GO-SRS/%v is a golang implementation os SRS", core.Version))
