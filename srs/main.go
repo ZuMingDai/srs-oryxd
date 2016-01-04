@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"go-oryxd/core"
 	"os"
+
+	"github.com/ZuMingDai/srs-oryxd/core"
 )
 
 //the startup argv
@@ -12,15 +13,13 @@ import (
 //	--c conf/srs.json
 //	-c=conf/srs.json
 //	--c=conf/srs.json
-var conffile = *flag.String("c", "D:/mygo/src/go-oryxd/conf/srs.json", "the config file.")
+var conffile = *flag.String("c", "D:\\mygo\\src\\github.com\\ZuMingDai\\srs-oryxd\\conf\\srs.json", "the config file.")
 
 func run() int {
 	core.LoggerTrace.Println(fmt.Sprintf("GO-SRS/%v is a golang implementation os SRS", core.Version))
 	flag.Parse()
 
 	conf := &core.Config{}
-	core.LoggerInfo.Println("start to parse config file", conffile)
-
 	if err := conf.Loads(conffile); err != nil {
 		core.LoggerError.Println("parse config", conffile, "failed, err is", err)
 		return -1
