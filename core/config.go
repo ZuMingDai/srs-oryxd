@@ -7,7 +7,19 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/signal"
+	"syscall"
 )
+
+const (
+	ReloadWorkers = iota
+	ReloadList
+	ReloadLog
+)
+
+type ReloadHandler interface {
+	OnReloadGlobal(scope int, cc, pc *Config) error
+}
 
 type Config struct {
 	Workers int `json:"workers"`
@@ -18,6 +30,15 @@ type Config struct {
 		Level string `json:"level"`
 		File  string `json:"file"`
 	} `json:"log"`
+	reloadHandlers []ReloadHandler `json:“-”`
+}
+
+var GsConfig = NewConfig()
+
+func NewConfig() *Config {
+	return &Config{
+		reloadHandlers: []ReloadHandler{},
+	}
 }
 
 func (c *Config) Loads(conf string) error {
@@ -91,4 +112,8 @@ func (c *Config) LogTank(level string, dw io.Writer) io.Writer {
 	}
 
 	return ioutil.Discard
+}
+
+func (c *Config) Subscribe(h ReloadHandler) {
+
 }

@@ -16,7 +16,7 @@ const (
 
 //the application loggers
 //info, the verbose info level, very detail log, the lowest lever, to discard
-var LoggerInfo Logger = log.New(ioutil.Discard, logLabel, log.LstdFlags)
+var LoggerInfo Logger = log.New(ioutil.Discard, logInfoLabel, log.LstdFlags)
 
 //
 var LoggerTrace Logger = log.New(os.Stdout, logTraceLabel, log.LstdFlags)
