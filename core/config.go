@@ -115,5 +115,61 @@ func (c *Config) LogTank(level string, dw io.Writer) io.Writer {
 }
 
 func (c *Config) Subscribe(h ReloadHandler) {
+	for _, v := range c.reloadHandlers {
+		if v == h {
+			return
+		}
+	}
+}
 
+func (c *Config) UnSubcribe(h ReloadHandler) {
+	for i, v := range c.reloadHandlers {
+		if v == h {
+			c.reloadHandlers = append(c.reloadHandlers[:i], c.reloadHandlers[i+1:]...)
+			return
+		}
+	}
+}
+
+func (c *Config) ReloadWorker(conf string) {
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, syscall.Signal(1))
+
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				LoggerError.Println("reload panic:", r)
+			}
+		}()
+
+		LoggerTrace.Println("wait for reload siginals:kill -1", os.Getpid())
+		for signal := range signals {
+			LoggerTrace.Println("reload by", signal)
+
+			pc := c
+			cc := NewConfig()
+			cc.reloadHandlers = pc.reloadHandlers[:]
+			if err := cc.Loads(conf); err != nil {
+				LoggerError.Println("reload config failed,err is", err)
+				continue
+			}
+
+			if err := doReload(cc, pc); err != nil {
+				LoggerError.Println("apply reload failed,err is".err)
+				continue
+			}
+			GsConfig = cc
+			LoggerTrace.Println("reload config ok")
+		}
+	}()
+}
+func doReload(cc, pc *Config) (err error) {
+	if cc.Workers != pc.Workers {
+		for _, h := range cc.reloadHandlers {
+			if err = h.OnReloadGlobal(ReloadWorkers, cc, pc); err != nil {
+				return
+			}
+		}
+		LoggerTrace.Println("reload apply workers ok")
+	}
 }

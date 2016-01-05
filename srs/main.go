@@ -13,17 +13,25 @@ import (
 //	--c conf/srs.json
 //	-c=conf/srs.json
 //	--c=conf/srs.json
-var conffile = *flag.String("c", "D:\\mygo\\src\\github.com\\ZuMingDai\\srs-oryxd\\conf\\srs.json", "the config file.")
+var confFile = *flag.String("c", "D:\\mygo\\src\\github.com\\ZuMingDai\\srs-oryxd\\conf\\srs.json", "the config file.")
 
 func run() int {
 	core.LoggerTrace.Println(fmt.Sprintf("GO-SRS/%v is a golang implementation os SRS", core.Version))
 	flag.Parse()
-
-	conf := &core.Config{}
-	if err := conf.Loads(conffile); err != nil {
-		core.LoggerError.Println("parse config", conffile, "failed, err is", err)
+	/*
+		conf := &core.Config{}
+		if err := conf.Loads(conffile); err != nil {
+			core.LoggerError.Println("parse config", conffile, "failed, err is", err)
+			return -1
+		}
+	*/
+	core.LoggerInfo.Println("star to parse config file", conffile)
+	if err := core.GsConfig.Loads(confFile); err != nil {
+		core.LoggerError.Println("parse config", confFile, "failed,err is", err)
 		return -1
 	}
+
+	go core.GoConfig.ReloadWorker(confFile)
 
 	core.LoggerTrace.Println("Copyright (c) 2013-2015 SRS(simple-rtmp-server")
 	return core.ServerRun(conf, func() int {
