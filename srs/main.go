@@ -25,16 +25,16 @@ func run() int {
 			return -1
 		}
 	*/
-	core.LoggerInfo.Println("star to parse config file", conffile)
+	core.LoggerInfo.Println("star to parse config file", confFile)
 	if err := core.GsConfig.Loads(confFile); err != nil {
 		core.LoggerError.Println("parse config", confFile, "failed,err is", err)
 		return -1
 	}
 
-	go core.GoConfig.ReloadWorker(confFile)
+	go core.GsConfig.ReloadWorker(confFile)
 
 	core.LoggerTrace.Println("Copyright (c) 2013-2015 SRS(simple-rtmp-server")
-	return core.ServerRun(conf, func() int {
+	return core.ServerRun(core.GsConfig, func() int {
 		return 0
 	})
 }

@@ -13,7 +13,7 @@ import (
 
 const (
 	ReloadWorkers = iota
-	ReloadList
+	ReloadListen
 	ReloadLog
 )
 
@@ -30,7 +30,7 @@ type Config struct {
 		Level string `json:"level"`
 		File  string `json:"file"`
 	} `json:"log"`
-	reloadHandlers []ReloadHandler `json:“-”`
+	reloadHandlers []ReloadHandler `json:"-"`
 }
 
 var GsConfig = NewConfig()
@@ -76,6 +76,7 @@ func (c *Config) Validate() error {
 
 }
 
+/*
 func (c *Config) Json() (string, error) {
 	if b, err := json.Marshal(c); err != nil {
 		return "", err
@@ -83,7 +84,7 @@ func (c *Config) Json() (string, error) {
 		return string(b), nil
 	}
 }
-
+*/
 func (c *Config) LogToFile() bool {
 	return c.Log.Tank == "file"
 }
@@ -120,9 +121,10 @@ func (c *Config) Subscribe(h ReloadHandler) {
 			return
 		}
 	}
+	c.reloadHandlers = append(c.reloadHandlers, h)
 }
 
-func (c *Config) UnSubcribe(h ReloadHandler) {
+func (c *Config) Unsubscribe(h ReloadHandler) {
 	for i, v := range c.reloadHandlers {
 		if v == h {
 			c.reloadHandlers = append(c.reloadHandlers[:i], c.reloadHandlers[i+1:]...)
@@ -155,7 +157,7 @@ func (c *Config) ReloadWorker(conf string) {
 			}
 
 			if err := doReload(cc, pc); err != nil {
-				LoggerError.Println("apply reload failed,err is".err)
+				LoggerError.Println("apply reload failed,err is", err)
 				continue
 			}
 			GsConfig = cc
@@ -172,4 +174,5 @@ func doReload(cc, pc *Config) (err error) {
 		}
 		LoggerTrace.Println("reload apply workers ok")
 	}
+	return
 }

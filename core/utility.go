@@ -17,7 +17,7 @@ func ServerRun(c *Config, callback func() int) int {
 		} else {
 			defer func() {
 				err = f.Close()
-				LoggerWarn = log.New(os.Stderr, "[gsrs][warn2222]", log.LstdFlags)
+				LoggerWarn = log.New(os.Stderr, "[gsrs][warn]", log.LstdFlags)
 				if err != nil {
 					LoggerWarn.Println("gracefully close log file", c.Log.File, "failed, err is", err)
 				} else {
