@@ -13,7 +13,7 @@ import (
 
 const (
 	ReloadWorkers = iota
-	ReloadListen
+	//	ReloadListen
 	ReloadLog
 )
 
@@ -25,11 +25,17 @@ type Config struct {
 	Workers int `json:"workers"`
 	Listen  int `json:"listen"`
 
+	Go struct {
+		GcInterval int `json:"gc_interval"`
+	}
+
 	Log struct {
 		Tank  string `json:"tank"`
 		Level string `json:"level"`
 		File  string `json:"file"`
 	} `json:"log"`
+
+	conf           string          `json:"-"`
 	reloadHandlers []ReloadHandler `json:"-"`
 }
 
@@ -42,6 +48,8 @@ func NewConfig() *Config {
 }
 
 func (c *Config) Loads(conf string) error {
+	c.conf = conf
+
 	if f, err := os.Open(conf); err != nil {
 		return err
 	} else if s, err := ioutil.ReadAll(f); err != nil {
@@ -62,6 +70,9 @@ func (c *Config) Validate() error {
 	}
 	if c.Listen <= 0 || c.Listen > 65535 {
 		return errors.New(fmt.Sprintf("listen must in(0,65535], actual is %v", c.Listen))
+	}
+	if c.Go.GcInterval <= 0 || c.Go.GcInterval >= 24*3600 {
+		return errors.New(fmt.Sprintf("go gc_interval must in (0, 24*3600], actual is %v", c.Go.GcInterval))
 	}
 	if c.Log.Level != "info" && c.Log.Level != "trace" && c.Log.Level != "warn" && c.Log.Level != "error" {
 		return errors.New(fmt.Sprintf("log.level must be info/trace/warn/error, actual is %v", c.Log.Level))
@@ -133,7 +144,7 @@ func (c *Config) Unsubscribe(h ReloadHandler) {
 	}
 }
 
-func (c *Config) ReloadWorker(conf string) {
+func ReloadWorker() {
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.Signal(1))
 
@@ -148,21 +159,24 @@ func (c *Config) ReloadWorker(conf string) {
 		for signal := range signals {
 			LoggerTrace.Println("reload by", signal)
 
-			pc := c
+			pc := GsConfig
 			cc := NewConfig()
 			cc.reloadHandlers = pc.reloadHandlers[:]
-			if err := cc.Loads(conf); err != nil {
+			if err := cc.Loads(GsConfig.conf); err != nil {
 				LoggerError.Println("reload config failed,err is", err)
 				continue
 			}
-
+			LoggerInfo.Println("reload parse fresh config ok")
 			if err := doReload(cc, pc); err != nil {
 				LoggerError.Println("apply reload failed,err is", err)
 				continue
 			}
+			LoggerInfo.Println("reload completed work")
+
 			GsConfig = cc
 			LoggerTrace.Println("reload config ok")
 		}
+
 	}()
 }
 func doReload(cc, pc *Config) (err error) {
@@ -173,6 +187,20 @@ func doReload(cc, pc *Config) (err error) {
 			}
 		}
 		LoggerTrace.Println("reload apply workers ok")
+	} else {
+		LoggerInfo.Println("reload ignore workers")
 	}
+
+	if cc.Log.File != pc.Log.File || cc.Log.Level != pc.Log.Level || cc.Log.Tank != pc.Log.Tank {
+		for _, h := range cc.reloadHandlers {
+			if err = h.OnReloadGlobal(ReloadLog, cc, pc); err != nil {
+				return
+			}
+		}
+		LoggerTrace.Println("reload apply log ok")
+	} else {
+		LoggerInfo.Println("reload ignore log")
+	}
+
 	return
 }
