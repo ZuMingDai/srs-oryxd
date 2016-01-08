@@ -16,7 +16,7 @@ import (
 var confFile = *flag.String("c", "D:\\mygo\\src\\github.com\\ZuMingDai\\srs-oryxd\\conf\\srs.json", "the config file.")
 
 func run() int {
-	core.LoggerTrace.Println(fmt.Sprintf("GO-SRS/%v is a golang implementation os SRS", core.Version))
+//	core.LoggerTrace.Println(fmt.Sprintf("GO-SRS/%v is a golang implementation os SRS", core.Version))
 	flag.Parse()
 
 	svr := core.NewServer()
@@ -27,8 +27,8 @@ func run() int {
 		return -1
 	}
 
-	if err := svr.PreparseLogger(); err != nil {
-		core.LoggerError.Println("preparse logger failed,err is", err)
+	if err := svr.PrepareLogger(); err != nil {
+		core.LoggerError.Println("prepare logger failed,err is", err)
 		return -1
 	}
 
@@ -42,9 +42,9 @@ func run() int {
 	*/
 	core.LoggerTrace.Println("Copyright (c) 2013-2015 SRS(simple-rtmp-server")
 
-	core.LoggerTrace.Println(fmt.Sprintf("GO-SRS/%v is a golang implementation os SRS.", core.Version))
-	if err := svr.Initalize(); err != nil {
-		core.LoggerError.Println("initalize server failed,err is", err)
+	core.LoggerTrace.Println(fmt.Sprintf("GO-SRS/%v is a golang implementation of SRS.", core.Version))
+	if err := svr.Initialize(); err != nil {
+		core.LoggerError.Println("initialize server failed,err is", err)
 		return -1
 	}
 

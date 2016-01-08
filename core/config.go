@@ -176,9 +176,9 @@ func ReloadWorker() {
 			GsConfig = cc
 			LoggerTrace.Println("reload config ok")
 		}
-
 	}()
 }
+
 func doReload(cc, pc *Config) (err error) {
 	if cc.Workers != pc.Workers {
 		for _, h := range cc.reloadHandlers {

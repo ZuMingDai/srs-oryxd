@@ -13,6 +13,7 @@ func NewServer() *Server {
 	svr := &Server{
 		logger: &simpleLogger{},
 	}
+	GsConfig.Subscribe(svr)
 	return svr
 }
 
@@ -28,39 +29,40 @@ func (s *Server) ParseConfig(conf string) (err error) {
 	return
 }
 
-func (s *Server) PreparseLogger() (err error) {
+func (s *Server) PrepareLogger() (err error) {
 	if err = s.applyLogger(GsConfig); err != nil {
 		return
 	}
 	return
 }
 
-func (s *Server) Initalize() (err error) {
+func (s *Server) Initialize() (err error) {
 	go ReloadWorker()
 
 	return
 }
 
 func (s *Server) Run() (err error) {
-	s.applyMutipleProcesses(GsConfig.Workers)
+	s.applyMultipleProcesses(GsConfig.Workers)
 
 	for {
 		runtime.GC()
-		LoggerInfo.Println("go runtime tc every", GsConfig.Go.GcInterval, "seconds")
+		LoggerInfo.Println("go runtime gc every", GsConfig.Go.GcInterval, "seconds")
 		time.Sleep(time.Second * time.Duration(GsConfig.Go.GcInterval))
 	}
+	return
 }
 
 func (s *Server) OnReloadGlobal(scope int, cc, pc *Config) (err error) {
 	if scope == ReloadWorkers {
-		s.applyMutipleProcesses(cc.Workers)
+		s.applyMultipleProcesses(cc.Workers)
 	} else if scope == ReloadLog {
 		s.applyLogger(cc)
 	}
 	return
 }
 
-func (s *Server) applyMutipleProcesses(workers int) {
+func (s *Server) applyMultipleProcesses(workers int) {
 	pv := runtime.GOMAXPROCS(workers)
 	LoggerTrace.Println("apply workers", workers, "and previousis", pv)
 }
@@ -69,7 +71,7 @@ func (s *Server) applyLogger(c *Config) (err error) {
 	if err = s.logger.Close(c); err != nil {
 		return
 	}
-	LoggerInfo.Println("close looger ok")
+	LoggerInfo.Println("close logger ok")
 
 	if err = s.logger.Open(c); err != nil {
 		return
