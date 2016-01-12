@@ -1,12 +1,9 @@
 {
-  "workers": 5,
+  "workers": 4,
   "listen": 1935,
-  "go":{
-		"gc_interval":300
-	},
   "log":{
-    "tank": "console",
+    "tank": "file",
     "level": "trace",
-    "file": "./gsrs.log"
+    "file": "gsrs.log"
   }
 }

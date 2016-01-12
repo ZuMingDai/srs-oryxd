@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"runtime"
 	"time"
 )
@@ -39,6 +40,14 @@ func (s *Server) PrepareLogger() (err error) {
 func (s *Server) Initialize() (err error) {
 	go ReloadWorker()
 
+	c := GsConfig
+	l := fmt.Sprintf("%v(%v%v)", c.Log.Tank, c.Log.Level, c.Log.File)
+	if !c.LogToFile() {
+		l = fmt.Sprintf("%v(%v)", c.Log.Tank, c.Log.Level)
+	}
+
+	LoggerTrace.Println(fmt.Sprintf("init server ok,conf=%v, log=%v,workers=%v", c.conf, l, c.Workers))
+
 	return
 }
 
@@ -64,7 +73,13 @@ func (s *Server) OnReloadGlobal(scope int, cc, pc *Config) (err error) {
 
 func (s *Server) applyMultipleProcesses(workers int) {
 	pv := runtime.GOMAXPROCS(workers)
-	LoggerTrace.Println("apply workers", workers, "and previousis", pv)
+
+	if pv != workers {
+		LoggerTrace.Println("apply workers", workers, "and previousis", pv)
+	} else {
+		LoggerInfo.Println("apply workers", workers, "and previousis", pv)
+	}
+
 }
 
 func (s *Server) applyLogger(c *Config) (err error) {

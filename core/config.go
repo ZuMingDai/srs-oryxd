@@ -45,12 +45,13 @@ func NewConfig() *Config {
 	c := &Config{
 		reloadHandlers: []ReloadHandler{},
 	}
-	c.Workers = 4
+	//default to use 1 cpu
+	c.Workers = 1
 	c.Go.GcInterval = 300
 
 	c.Log.Tank = "file"
 	c.Log.Level = "trace"
-	c.Log.File = "./gsrs.log"
+	c.Log.File = "gsrs.log"
 
 	return c
 }
@@ -166,7 +167,7 @@ func ReloadWorker() {
 
 		LoggerTrace.Println("wait for reload siginals:kill -1", os.Getpid())
 		for signal := range signals {
-			LoggerTrace.Println("reload by", signal)
+			LoggerTrace.Println("start reload by", signal)
 
 			pc := GsConfig
 			cc := NewConfig()

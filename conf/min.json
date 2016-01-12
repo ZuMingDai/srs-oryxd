@@ -1,9 +1,3 @@
 {
-	"workers":4,
-	"listen":1935,
-	"log":{
-		"tank":"file",
-		"level":"trace",
-		"file":"gsrs.log"
-	}
+	"listen":1935
 }
