@@ -1,0 +1,12 @@
+{
+	"workers":1,
+	"listen":1935,
+	"go":{
+		"gc_interval":300
+	}
+	"log":{
+		"tank":"file",
+		"level":"trace",
+		"file":"gsrs.log",
+	}
+}
