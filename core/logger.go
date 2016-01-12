@@ -43,6 +43,7 @@ func (l *simpleLogger) Open(c *Config) (err error) {
 
 	if c.LogToFile() {
 		LoggerTrace.Println("apply log file", c.Log.File)
+		LoggerTrace.Println("please see detail of log:tailf", c.Log.File)
 
 		if l.file, err = os.OpenFile(c.Log.File, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644); err != nil {
 			LoggerError.Println("open log file", c.Log.File, "failed,err is", err)
@@ -54,7 +55,6 @@ func (l *simpleLogger) Open(c *Config) (err error) {
 			LoggerError = log.New(c.LogTank("error", l.file), logErrorLabel, log.LstdFlags)
 		}
 
-		LoggerTrace.Println("please see detail of log:tailf", c.Log.File)
 	} else {
 		LoggerInfo = log.New(c.LogTank("info", os.Stdout), logInfoLabel, log.LstdFlags)
 		LoggerTrace = log.New(c.LogTank("trace", os.Stdout), logTraceLabel, log.LstdFlags)

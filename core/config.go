@@ -42,23 +42,32 @@ type Config struct {
 var GsConfig = NewConfig()
 
 func NewConfig() *Config {
-	return &Config{
+	c := &Config{
 		reloadHandlers: []ReloadHandler{},
 	}
+	c.Workers = 4
+	c.Go.GcInterval = 300
+
+	c.Log.Tank = "file"
+	c.Log.Level = "trace"
+	c.Log.File = "./gsrs.log"
+
+	return c
 }
 
 func (c *Config) Loads(conf string) error {
 	c.conf = conf
 
+	var s []byte
 	if f, err := os.Open(conf); err != nil {
 		return err
-	} else if s, err := ioutil.ReadAll(f); err != nil {
+	} else if s, err = ioutil.ReadAll(f); err != nil {
 		return err
-	} else if err := json.Unmarshal([]byte(s), c); err != nil {
-		return err
-	} else {
-		return c.Validate()
 	}
+	if err := json.Unmarshal([]byte(s), c); err != nil {
+		return err
+	}
+	return c.Validate()
 }
 
 func (c *Config) Validate() error {

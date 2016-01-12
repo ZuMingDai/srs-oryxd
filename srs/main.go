@@ -13,17 +13,17 @@ import (
 //	--c conf/srs.json
 //	-c=conf/srs.json
 //	--c=conf/srs.json
-var confFile = *flag.String("c", "D:\\mygo\\src\\github.com\\ZuMingDai\\srs-oryxd\\conf\\srs.json", "the config file.")
+var confFile = flag.String("c", "D:\\mygo\\src\\github.com\\ZuMingDai\\srs-oryxd\\conf\\srs.json", "the config file.")
 
 func run() int {
-//	core.LoggerTrace.Println(fmt.Sprintf("GO-SRS/%v is a golang implementation os SRS", core.Version))
+	//	core.LoggerTrace.Println(fmt.Sprintf("GO-SRS/%v is a golang implementation os SRS", core.Version))
 	flag.Parse()
 
 	svr := core.NewServer()
 	defer svr.Close()
 
-	if err := svr.ParseConfig(confFile); err != nil {
-		core.LoggerError.Println("parse config from", confFile, "failed,err is", err)
+	if err := svr.ParseConfig(*confFile); err != nil {
+		core.LoggerError.Println("parse config from", *confFile, "failed,err is", err)
 		return -1
 	}
 
