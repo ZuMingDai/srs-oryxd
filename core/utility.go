@@ -1,5 +1,6 @@
 package core
 
+/*
 import (
 	"log"
 	"os"
@@ -41,3 +42,4 @@ func ServerRun(c *Config, callback func() int) int {
 
 	return callback()
 }
+*/

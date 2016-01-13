@@ -73,7 +73,7 @@ func (c *Config) Loads(conf string) error {
 
 func (c *Config) Validate() error {
 	if c.Log.Level == "info" {
-		LoggerWarn.Println("info level hurts performance")
+		GsWarn.Println("info level hurts performance")
 	}
 	if c.Workers <= 0 || c.Workers > 64 {
 		return errors.New(fmt.Sprintf("workers must in(0,64], actual is %v", c.Workers))
@@ -161,30 +161,30 @@ func ReloadWorker() {
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
-				LoggerError.Println("reload panic:", r)
+				GsError.Println("reload panic:", r)
 			}
 		}()
 
-		LoggerTrace.Println("wait for reload siginals:kill -1", os.Getpid())
+		GsTrace.Println("wait for reload siginals:kill -1", os.Getpid())
 		for signal := range signals {
-			LoggerTrace.Println("start reload by", signal)
+			GsTrace.Println("start reload by", signal)
 
 			pc := GsConfig
 			cc := NewConfig()
 			cc.reloadHandlers = pc.reloadHandlers[:]
 			if err := cc.Loads(GsConfig.conf); err != nil {
-				LoggerError.Println("reload config failed,err is", err)
+				GsError.Println("reload config failed,err is", err)
 				continue
 			}
-			LoggerInfo.Println("reload parse fresh config ok")
+			GsInfo.Println("reload parse fresh config ok")
 			if err := doReload(cc, pc); err != nil {
-				LoggerError.Println("apply reload failed,err is", err)
+				GsError.Println("apply reload failed,err is", err)
 				continue
 			}
-			LoggerInfo.Println("reload completed work")
+			GsInfo.Println("reload completed work")
 
 			GsConfig = cc
-			LoggerTrace.Println("reload config ok")
+			GsTrace.Println("reload config ok")
 		}
 	}()
 }
@@ -196,9 +196,9 @@ func doReload(cc, pc *Config) (err error) {
 				return
 			}
 		}
-		LoggerTrace.Println("reload apply workers ok")
+		GsTrace.Println("reload apply workers ok")
 	} else {
-		LoggerInfo.Println("reload ignore workers")
+		GsInfo.Println("reload ignore workers")
 	}
 
 	if cc.Log.File != pc.Log.File || cc.Log.Level != pc.Log.Level || cc.Log.Tank != pc.Log.Tank {
@@ -207,9 +207,9 @@ func doReload(cc, pc *Config) (err error) {
 				return
 			}
 		}
-		LoggerTrace.Println("reload apply log ok")
+		GsTrace.Println("reload apply log ok")
 	} else {
-		LoggerInfo.Println("reload ignore log")
+		GsInfo.Println("reload ignore log")
 	}
 
 	return
