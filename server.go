@@ -41,7 +41,7 @@ func (s *Server) Initialize() (err error) {
 	go ReloadWorker()
 
 	c := GsConfig
-	l := fmt.Sprintf("%v(%v%v)", c.Log.Tank, c.Log.Level, c.Log.File)
+	l := fmt.Sprintf("%v(%v/%v)", c.Log.Tank, c.Log.Level, c.Log.File)
 	if !c.LogToFile() {
 		l = fmt.Sprintf("%v(%v)", c.Log.Tank, c.Log.Level)
 	}
