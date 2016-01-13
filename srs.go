@@ -14,6 +14,7 @@ import (
 var confFile = flag.String("c", "D:\\mygo\\src\\github.com\\ZuMingDai\\srs-oryxd\\conf\\srs.json", "the config file.")
 
 func run() int {
+
 	//	core.LoggerTrace.Println(fmt.Sprintf("GO-SRS/%v is a golang implementation os SRS", core.Version))
 	flag.Parse()
 
@@ -39,7 +40,7 @@ func run() int {
 		go core.GsConfig.ReloadWorker(confFile)
 	*/
 	GsTrace.Println("Copyright (c) 2013-2015 SRS(simple-rtmp-server")
-
+	GsTrace.Println("enter run()")
 	GsTrace.Println(fmt.Sprintf("GO-SRS/%v is a golang implementation of SRS.", Version()))
 	if err := svr.Initialize(); err != nil {
 		GsError.Println("initialize server failed,err is", err)
@@ -50,11 +51,7 @@ func run() int {
 		GsError.Println("run server failed, err is", err)
 		return -1
 	}
-	/*
-		return core.ServerRun(core.GsConfig, func() int {
-			return 0
-		})
-	*/
+
 	return 0
 }
 
