@@ -28,9 +28,9 @@ var GsWarn Logger = log.New(os.Stderr, logWarnLabel, log.LstdFlags)
 var GsError Logger = log.New(os.Stderr, logErrorLabel, log.LstdFlags)
 
 type Logger interface {
-	Print(a ...interface{})
+	//	Print(a ...interface{})
 	Println(a ...interface{})
-	Printf(format string, a ...interface{})
+	//Printf(format string, a ...interface{})
 }
 
 type simpleLogger struct {

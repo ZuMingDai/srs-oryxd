@@ -38,7 +38,7 @@ func (s *Server) PrepareLogger() (err error) {
 }
 
 func (s *Server) Initialize() (err error) {
-	go ReloadWorker()
+	go reloadWorker()
 
 	c := GsConfig
 	l := fmt.Sprintf("%v(%v/%v)", c.Log.Tank, c.Log.Level, c.Log.File)
