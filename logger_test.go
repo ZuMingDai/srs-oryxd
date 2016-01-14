@@ -18,5 +18,5 @@ func TestBasicLogger(t *testing.T) {
 	GsWarn.Println("test logger warn ok.")
 	GsError.Println("test logger error ok.")
 
-	t.Error("logger format error.")
+	//	t.Error("logger format error.")
 }
