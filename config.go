@@ -81,7 +81,7 @@ func (c *Config) Validate() error {
 	if c.Listen <= 0 || c.Listen > 65535 {
 		return errors.New(fmt.Sprintf("listen must in(0,65535], actual is %v", c.Listen))
 	}
-	if c.Go.GcInterval <= 0 || c.Go.GcInterval >= 24*3600 {
+	if c.Go.GcInterval <= 0 || c.Go.GcInterval > 24*3600 {
 		return errors.New(fmt.Sprintf("go gc_interval must in (0, 24*3600], actual is %v", c.Go.GcInterval))
 	}
 	if c.Log.Level != "info" && c.Log.Level != "trace" && c.Log.Level != "warn" && c.Log.Level != "error" {
@@ -165,7 +165,7 @@ func ReloadWorker() {
 			}
 		}()
 
-		GsTrace.Println("wait for reload siginals:kill -1", os.Getpid())
+		GsTrace.Println("wait for reload signals:kill -1", os.Getpid())
 		for signal := range signals {
 			GsTrace.Println("start reload by", signal)
 

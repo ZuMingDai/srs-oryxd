@@ -40,7 +40,7 @@ func run() int {
 		go core.GsConfig.ReloadWorker(confFile)
 	*/
 	GsTrace.Println("Copyright (c) 2013-2015 SRS(simple-rtmp-server")
-	GsTrace.Println("enter run()")
+
 	GsTrace.Println(fmt.Sprintf("GO-SRS/%v is a golang implementation of SRS.", Version()))
 	if err := svr.Initialize(); err != nil {
 		GsError.Println("initialize server failed,err is", err)

@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestBaseceLogger(t *testing.T) {
+func TestBasicLogger(t *testing.T) {
 
 	GsInfo = log.New(ioutil.Discard, logLabel, log.LstdFlags)
 	GsTrace = log.New(ioutil.Discard, logLabel, log.LstdFlags)
