@@ -28,7 +28,7 @@ func TestBasicConfig(t *testing.T) {
 		t.Error("log level failed.")
 	}
 
-	if c.Log.File != "gsrs.go" {
+	if c.Log.File != "gsrs.log" {
 		t.Error("log file failed.")
 	}
 }

@@ -1,10 +1,10 @@
-package mian
+package main
 
 import (
 	"os"
 	"testing"
 )
 
-func TestMian(m *testing.M) {
+func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
