@@ -4,6 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/ZuMingDai/srs-oryxd/app"
+	"github.com/ZuMingDai/srs-oryxd/core"
 )
 
 //the startup argv
@@ -18,16 +21,16 @@ func run() int {
 	//	core.LoggerTrace.Println(fmt.Sprintf("GO-SRS/%v is a golang implementation os SRS", core.Version))
 	flag.Parse()
 
-	svr := NewServer()
+	svr := app.NewServer()
 	defer svr.Close()
 
 	if err := svr.ParseConfig(*confFile); err != nil {
-		GsError.Println("parse config from", *confFile, "failed,err is", err)
+		core.GsError.Println("parse config from", *confFile, "failed,err is", err)
 		return -1
 	}
 
 	if err := svr.PrepareLogger(); err != nil {
-		GsError.Println("prepare logger failed,err is", err)
+		core.GsError.Println("prepare logger failed,err is", err)
 		return -1
 	}
 
@@ -39,16 +42,16 @@ func run() int {
 		}
 		go core.GsConfig.ReloadWorker(confFile)
 	*/
-	GsTrace.Println("Copyright (c) 2013-2015 SRS(simple-rtmp-server")
+	core.GsTrace.Println("Copyright (c) 2013-2015 SRS(simple-rtmp-server")
 
-	GsTrace.Println(fmt.Sprintf("GO-SRS/%v is a golang implementation of SRS.", Version()))
+	core.GsTrace.Println(fmt.Sprintf("GO-SRS/%v is a golang implementation of SRS.", Version()))
 	if err := svr.Initialize(); err != nil {
-		GsError.Println("initialize server failed,err is", err)
+		core.GsError.Println("initialize server failed,err is", err)
 		return -1
 	}
 
 	if err := svr.Run(); err != nil {
-		GsError.Println("run server failed, err is", err)
+		core.GsError.Println("run server failed, err is", err)
 		return -1
 	}
 

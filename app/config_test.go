@@ -1,22 +1,24 @@
-package main
+package app
 
 import (
 	"fmt"
 	"testing"
+
+	"github.com/ZuMingDai/srs-oryxd/core"
 )
 
 func TestBasicConfig(t *testing.T) {
 	c := NewConfig()
 
-	if c.Workers != Workers {
+	if c.Workers != core.Workers {
 		t.Error("workers failed.")
 	}
 
-	if c.Listen != RtmpListen {
+	if c.Listen != core.RtmpListen {
 		t.Error("listen failed.")
 	}
 
-	if c.Go.GcInterval != GcIntervalSeconds {
+	if c.Go.GcInterval != core.GcIntervalSeconds {
 		t.Error("go gc interval failed.")
 	}
 

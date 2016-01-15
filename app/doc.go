@@ -6,4 +6,4 @@ Fox example:"
 	&& ./obje/srs -c conf/console.json
 */
 
-package main
+package app

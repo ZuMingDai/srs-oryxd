@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"io/ioutil"
@@ -8,10 +8,10 @@ import (
 
 const (
 	logLabel      = "[gsrs]"
-	logInfoLabel  = logLabel + "[info]"
-	logTraceLabel = logLabel + "[trace]"
-	logWarnLabel  = logLabel + "[warn]"
-	logErrorLabel = logLabel + "[error]"
+	LogInfoLabel  = logLabel + "[info]"
+	LogTraceLabel = logLabel + "[trace]"
+	LogWarnLabel  = logLabel + "[warn]"
+	LogErrorLabel = logLabel + "[error]"
 )
 
 //the application loggers
@@ -37,6 +37,7 @@ type simpleLogger struct {
 	file *os.File
 }
 
+/*
 func (l *simpleLogger) Open(c *Config) (err error) {
 	GsInfo.Println("apply log tank", c.Log.Tank)
 	GsInfo.Println("apply log level", c.Log.Level)
@@ -81,3 +82,4 @@ func (l *simpleLogger) Close(c *Config) (err error) {
 	}
 	return
 }
+*/

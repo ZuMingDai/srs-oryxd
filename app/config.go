@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"encoding/json"
@@ -9,6 +9,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/ZuMingDai/srs-oryxd/core"
 )
 
 const (
@@ -46,9 +48,9 @@ func NewConfig() *Config {
 		reloadHandlers: []ReloadHandler{},
 	}
 	//default to use 1 cpu
-	c.Workers = Workers
-	c.Listen = RtmpListen
-	c.Go.GcInterval = GcIntervalSeconds
+	c.Workers = core.Workers
+	c.Listen = core.RtmpListen
+	c.Go.GcInterval = core.GcIntervalSeconds
 
 	c.Log.Tank = "file"
 	c.Log.Level = "trace"
@@ -74,7 +76,7 @@ func (c *Config) Loads(conf string) error {
 
 func (c *Config) Validate() error {
 	if c.Log.Level == "info" {
-		GsWarn.Println("info level hurts performance")
+		core.GsWarn.Println("info level hurts performance")
 	}
 	if c.Workers <= 0 || c.Workers > 64 {
 		return errors.New(fmt.Sprintf("workers must in(0,64], actual is %v", c.Workers))
@@ -162,13 +164,13 @@ func reloadWorker() {
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
-				GsError.Println("reload panic:", r)
+				core.GsError.Println("reload panic:", r)
 			}
 		}()
 
-		GsTrace.Println("wait for reload signals:kill -1", os.Getpid())
+		core.GsTrace.Println("wait for reload signals:kill -1", os.Getpid())
 		for signal := range signals {
-			GsTrace.Println("start reload by", signal)
+			core.GsTrace.Println("start reload by", signal)
 			if err := reload(); err != nil {
 				continue
 			}
@@ -182,18 +184,18 @@ func reload() (err error) {
 	cc := NewConfig()
 	cc.reloadHandlers = pc.reloadHandlers[:]
 	if err := cc.Loads(GsConfig.conf); err != nil {
-		GsError.Println("reload config failed,err is", err)
+		core.GsError.Println("reload config failed,err is", err)
 		return err
 	}
 	GsInfo.Println("reload parse fresh config ok")
 	if err := pc.Reload(cc); err != nil {
-		GsError.Println("apply reload failed,err is", err)
+		core.GsError.Println("apply reload failed,err is", err)
 		return err
 	}
-	GsInfo.Println("reload completed work")
+	core.GsInfo.Println("reload completed work")
 
 	GsConfig = cc
-	GsTrace.Println("reload config ok")
+	core.GsTrace.Println("reload config ok")
 
 	return
 }
@@ -205,9 +207,9 @@ func (pc *Config) Reload(cc *Config) (err error) {
 				return
 			}
 		}
-		GsTrace.Println("reload apply workers ok")
+		core.GsTrace.Println("reload apply workers ok")
 	} else {
-		GsInfo.Println("reload ignore workers")
+		core.GsInfo.Println("reload ignore workers")
 	}
 
 	if cc.Log.File != pc.Log.File || cc.Log.Level != pc.Log.Level || cc.Log.Tank != pc.Log.Tank {
@@ -216,9 +218,9 @@ func (pc *Config) Reload(cc *Config) (err error) {
 				return
 			}
 		}
-		GsTrace.Println("reload apply log ok")
+		core.GsTrace.Println("reload apply log ok")
 	} else {
-		GsInfo.Println("reload ignore log")
+		core.GsInfo.Println("reload ignore log")
 	}
 
 	return

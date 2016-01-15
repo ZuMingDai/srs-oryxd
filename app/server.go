@@ -1,9 +1,11 @@
-package main
+package app
 
 import (
 	"fmt"
 	"runtime"
 	"time"
+
+	"github.com/ZuMingDai/srs-oryxd/core"
 )
 
 type Server struct {
@@ -23,7 +25,7 @@ func (s *Server) Close() {
 }
 
 func (s *Server) ParseConfig(conf string) (err error) {
-	GsTrace.Println("start to parse config file", conf)
+	core.GsTrace.Println("start to parse config file", conf)
 	if err = GsConfig.Loads(conf); err != nil {
 		return
 	}
@@ -46,7 +48,7 @@ func (s *Server) Initialize() (err error) {
 		l = fmt.Sprintf("%v(%v)", c.Log.Tank, c.Log.Level)
 	}
 
-	GsTrace.Println(fmt.Sprintf("init server ok,conf=%v, log=%v,workers=%v", c.conf, l, c.Workers))
+	core.GsTrace.Println(fmt.Sprintf("init server ok,conf=%v, log=%v,workers=%v", c.conf, l, c.Workers))
 
 	return
 }
@@ -56,7 +58,7 @@ func (s *Server) Run() (err error) {
 
 	for {
 		runtime.GC()
-		GsInfo.Println("go runtime gc every", GsConfig.Go.GcInterval, "seconds")
+		core.GsInfo.Println("go runtime gc every", GsConfig.Go.GcInterval, "seconds")
 		time.Sleep(time.Second * time.Duration(GsConfig.Go.GcInterval))
 	}
 	return
@@ -75,9 +77,9 @@ func (s *Server) applyMultipleProcesses(workers int) {
 	pv := runtime.GOMAXPROCS(workers)
 
 	if pv != workers {
-		GsTrace.Println("apply workers", workers, "and previousis", pv)
+		core.GsTrace.Println("apply workers", workers, "and previousis", pv)
 	} else {
-		GsInfo.Println("apply workers", workers, "and previousis", pv)
+		core.GsInfo.Println("apply workers", workers, "and previousis", pv)
 	}
 
 }
@@ -86,12 +88,12 @@ func (s *Server) applyLogger(c *Config) (err error) {
 	if err = s.logger.Close(c); err != nil {
 		return
 	}
-	GsInfo.Println("close logger ok")
+	core.GsInfo.Println("close logger ok")
 
 	if err = s.logger.Open(c); err != nil {
 		return
 	}
-	GsInfo.Println("open logger ok")
+	core.GsInfo.Println("open logger ok")
 
 	return
 }
