@@ -44,4 +44,6 @@ func BenchmarkConfigBasic(b *testing.B) {
 func ExampleConfig_Loads() {
 	c := NewConfig()
 	fmt.Println("listen at", c.Listen)
+	fmt.Println("workers is", c.Workers)
+	fmt.Println("go gc every", c.Go.GcInterval, "seconds.")
 }
