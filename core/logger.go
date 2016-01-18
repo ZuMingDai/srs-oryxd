@@ -16,16 +16,16 @@ const (
 
 //the application loggers
 //info, the verbose info level, very detail log, the lowest lever, to discard
-var GsInfo Logger = log.New(ioutil.Discard, logInfoLabel, log.LstdFlags)
+var GsInfo Logger = log.New(ioutil.Discard, LogInfoLabel, log.LstdFlags)
 
 //
-var GsTrace Logger = log.New(os.Stdout, logTraceLabel, log.LstdFlags)
+var GsTrace Logger = log.New(os.Stdout, LogTraceLabel, log.LstdFlags)
 
 //
-var GsWarn Logger = log.New(os.Stderr, logWarnLabel, log.LstdFlags)
+var GsWarn Logger = log.New(os.Stderr, LogWarnLabel, log.LstdFlags)
 
 //
-var GsError Logger = log.New(os.Stderr, logErrorLabel, log.LstdFlags)
+var GsError Logger = log.New(os.Stderr, LogErrorLabel, log.LstdFlags)
 
 type Logger interface {
 	//	Print(a ...interface{})

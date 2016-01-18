@@ -7,7 +7,7 @@ import (
 	"github.com/ZuMingDai/srs-oryxd/core"
 )
 
-func TestBasicConfig(t *testing.T) {
+func TestConfigBasic(t *testing.T) {
 	c := NewConfig()
 
 	if c.Workers != core.Workers {

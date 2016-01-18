@@ -93,7 +93,7 @@ func (c *Config) Validate() error {
 	if c.Log.Tank != "console" && c.Log.Tank != "file" {
 		return errors.New(fmt.Sprintf("log.tank must be console/file, actual is %v", c.Log.Tank))
 	}
-	if c.Log.File == "file" && len(c.Log.File) == 0 {
+	if c.Log.Tank == "file" && len(c.Log.File) == 0 {
 		return errors.New("log.file must not be empty for file tank")
 	}
 	return nil
@@ -157,6 +157,33 @@ func (c *Config) Unsubscribe(h ReloadHandler) {
 	}
 }
 
+
+
+func (pc *Config) Reload(cc *Config) (err error) {
+	if cc.Workers != pc.Workers {
+		for _, h := range cc.reloadHandlers {
+			if err = h.OnReloadGlobal(ReloadWorkers, cc, pc); err != nil {
+				return
+			}
+		}
+		core.GsTrace.Println("reload apply workers ok")
+	} else {
+		core.GsInfo.Println("reload ignore workers")
+	}
+
+	if cc.Log.File != pc.Log.File || cc.Log.Level != pc.Log.Level || cc.Log.Tank != pc.Log.Tank {
+		for _, h := range cc.reloadHandlers {
+			if err = h.OnReloadGlobal(ReloadLog, cc, pc); err != nil {
+				return
+			}
+		}
+		core.GsTrace.Println("reload apply log ok")
+	} else {
+		core.GsInfo.Println("reload ignore log")
+	}
+
+	return
+}
 func reloadWorker() {
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.Signal(1))
@@ -187,7 +214,7 @@ func reload() (err error) {
 		core.GsError.Println("reload config failed,err is", err)
 		return err
 	}
-	GsInfo.Println("reload parse fresh config ok")
+	core.GsInfo.Println("reload parse fresh config ok")
 	if err := pc.Reload(cc); err != nil {
 		core.GsError.Println("apply reload failed,err is", err)
 		return err
@@ -196,32 +223,6 @@ func reload() (err error) {
 
 	GsConfig = cc
 	core.GsTrace.Println("reload config ok")
-
-	return
-}
-
-func (pc *Config) Reload(cc *Config) (err error) {
-	if cc.Workers != pc.Workers {
-		for _, h := range cc.reloadHandlers {
-			if err = h.OnReloadGlobal(ReloadWorkers, cc, pc); err != nil {
-				return
-			}
-		}
-		core.GsTrace.Println("reload apply workers ok")
-	} else {
-		core.GsInfo.Println("reload ignore workers")
-	}
-
-	if cc.Log.File != pc.Log.File || cc.Log.Level != pc.Log.Level || cc.Log.Tank != pc.Log.Tank {
-		for _, h := range cc.reloadHandlers {
-			if err = h.OnReloadGlobal(ReloadLog, cc, pc); err != nil {
-				return
-			}
-		}
-		core.GsTrace.Println("reload apply log ok")
-	} else {
-		core.GsInfo.Println("reload ignore log")
-	}
 
 	return
 }
