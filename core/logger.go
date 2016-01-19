@@ -32,11 +32,11 @@ type Logger interface {
 	Println(a ...interface{})
 	//Printf(format string, a ...interface{})
 }
+
 /*
 type simpleLogger struct {
 	file *os.File
 }
-
 
 func (l *simpleLogger) Open(c *Config) (err error) {
 	GsInfo.Println("apply log tank", c.Log.Tank)
