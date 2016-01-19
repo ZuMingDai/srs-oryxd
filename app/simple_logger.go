@@ -7,6 +7,10 @@ import (
 	"github.com/ZuMingDai/srs-oryxd/core"
 )
 
+type simpleLogger struct {
+	file *os.File
+}
+
 func (l *simpleLogger) Open(c *Config) (err error) {
 	core.GsInfo.Println("apply log tank", c.Log.Tank)
 	core.GsInfo.Println("apply log level", c.Log.Level)
@@ -41,7 +45,7 @@ func (l *simpleLogger) Close(c *Config) (err error) {
 		return
 	}
 
-	core.GsWarn = log.New(os.Stderr, logWarnLabel, log.LstdFlags)
+	core.GsWarn = log.New(os.Stderr, core.LogWarnLabel, log.LstdFlags)
 
 	if err = l.file.Close(); err != nil {
 		core.GsWarn.Println("gracefully close log file", c.Log.File, "failed,err is", err)

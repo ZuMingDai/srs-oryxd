@@ -1,1 +1,1 @@
-package main:wq
+package main
