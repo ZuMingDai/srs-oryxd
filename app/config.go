@@ -157,8 +157,6 @@ func (c *Config) Unsubscribe(h ReloadHandler) {
 	}
 }
 
-
-
 func (pc *Config) Reload(cc *Config) (err error) {
 	if cc.Workers != pc.Workers {
 		for _, h := range cc.reloadHandlers {
@@ -184,25 +182,46 @@ func (pc *Config) Reload(cc *Config) (err error) {
 
 	return
 }
-func reloadWorker() {
+func configReloadWorker(quit chan chan error) {
 	signals := make(chan os.Signal, 1)
+	//1:SIGHUP
 	signal.Notify(signals, syscall.Signal(1))
 
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				core.GsError.Println("reload panic:", r)
+	defer func() {
+		if r := recover(); r != nil {
+			core.GsError.Println("reload panic:", r)
+			q := make(chan error)
+			switch r := r.(type) {
+			case error:
+				q <- r
+			default:
+				q <- fmt.Errorf("%v", r)
 			}
-		}()
-
-		core.GsTrace.Println("wait for reload signals:kill -1", os.Getpid())
-		for signal := range signals {
-			core.GsTrace.Println("start reload by", signal)
-			if err := reload(); err != nil {
-				continue
-			}
+			quit <- q
 		}
 	}()
+
+	core.GsTrace.Println("wait for reload signals:kill -1", os.Getpid())
+	for {
+		select {
+		case signal := <-signals:
+			core.GsTrace.Println("start reload by", signal)
+
+			if err := reload(); err != nil {
+				core.GsError.Println("quit for reload failed. err is", err)
+
+				q := make(chan error)
+				q <- err
+				quit <- q
+				return
+			}
+		case q := <-quit:
+			core.GsWarn.Println("user stop reload.")
+			quit <- q
+			return
+		}
+	}
+
 }
 
 func reload() (err error) {

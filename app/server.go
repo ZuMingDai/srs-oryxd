@@ -2,18 +2,27 @@ package app
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
 	"runtime"
+	"sync"
+	"syscall"
 	"time"
 
 	"github.com/ZuMingDai/srs-oryxd/core"
 )
 
 type Server struct {
+	sigs   chan os.Signal
+	quit   chan chan error
+	wg     sync.WaitGroup
 	logger *simpleLogger
 }
 
 func NewServer() *Server {
 	svr := &Server{
+		sigs:   make(chan os.Signal, 1),
+		quit:   make(chan chan error, 1),
 		logger: &simpleLogger{},
 	}
 	GsConfig.Subscribe(svr)
@@ -40,7 +49,18 @@ func (s *Server) PrepareLogger() (err error) {
 }
 
 func (s *Server) Initialize() (err error) {
-	go reloadWorker()
+	//install signals
+	//TODO:FIXME: when process the current signal,others may drop
+	signal.Notify(s.sigs)
+
+	//reload goroutine
+	s.wg.Add(1)
+
+	go func() {
+		defer s.wg.Done()
+		configReloadWorker(s.quit)
+		core.GsTrace.Println("reload worker terminated.")
+	}()
 
 	c := GsConfig
 	l := fmt.Sprintf("%v(%v/%v)", c.Log.Tank, c.Log.Level, c.Log.File)
@@ -57,9 +77,28 @@ func (s *Server) Run() (err error) {
 	s.applyMultipleProcesses(GsConfig.Workers)
 
 	for {
-		runtime.GC()
-		core.GsInfo.Println("go runtime gc every", GsConfig.Go.GcInterval, "seconds")
-		time.Sleep(time.Second * time.Duration(GsConfig.Go.GcInterval))
+		select {
+		case signal := <-s.sigs:
+			core.GsTrace.Println("got signal", signal)
+			switch signal {
+			case os.Interrupt:
+				//SIGINT
+				fallthrough
+			case syscall.SIGTERM:
+				//SIGTERM
+				q := make(chan error)
+				s.quit <- q
+			}
+		case q := <-s.quit:
+			s.quit <- q
+			s.wg.Wait()
+			core.GsWarn.Println("server quit.")
+			return
+		case <-time.After(time.Second * time.Duration(GsConfig.Go.GcInterval)):
+			runtime.GC()
+			core.GsInfo.Println("go runtime gc every", GsConfig.Go.GcInterval, "seconds")
+		}
+
 	}
 	return
 }
