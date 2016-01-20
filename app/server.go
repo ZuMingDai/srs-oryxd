@@ -85,12 +85,12 @@ func (s *Server) applyMultipleProcesses(workers int) {
 }
 
 func (s *Server) applyLogger(c *Config) (err error) {
-	if err = s.logger.Close(c); err != nil {
+	if err = s.logger.close(c); err != nil {
 		return
 	}
 	core.GsInfo.Println("close logger ok")
 
-	if err = s.logger.Open(c); err != nil {
+	if err = s.logger.open(c); err != nil {
 		return
 	}
 	core.GsInfo.Println("open logger ok")
