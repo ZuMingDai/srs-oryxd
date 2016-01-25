@@ -86,7 +86,7 @@ func (s *Server) Run() (err error) {
 				fallthrough
 			case syscall.SIGTERM:
 				//SIGTERM
-				q := make(chan error)
+				q := make(chan error, 1)
 				s.quit <- q
 			}
 		case q := <-s.quit:
