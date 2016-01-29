@@ -13,15 +13,23 @@ import (
 )
 
 type Server struct {
-	sigs   chan os.Signal
-	quit   chan bool
-	wg     sync.WaitGroup
+	//signal handler
+	sigs chan os.Signal
+	//whether closed
+	closed bool
+	//for system internal to notify quit
+	quit chan bool
+	wg   sync.WaitGroup
+	//logger
 	logger *simpleLogger
+	//the locker for state,for instance,the closed.
+	lock sync.Mutex
 }
 
 func NewServer() *Server {
 	svr := &Server{
 		sigs:   make(chan os.Signal, 1),
+		closed: true,
 		quit:   make(chan bool, 1),
 		logger: &simpleLogger{},
 	}
@@ -30,7 +38,30 @@ func NewServer() *Server {
 }
 
 func (s *Server) Close() {
+	//notify to close
 	GsConfig.Unsubscribe(s)
+	select {
+	case s.quit <- true:
+	default:
+	}
+
+	//wait for stopped
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	//close
+	if s.closed {
+		core.GsInfo.Println("server already colsed.")
+		return
+	}
+
+	//do cleanup when stopped.
+	GsConfig.Unsubscribe(s)
+
+	//ok,closed
+	s.closed = true
+	core.GsInfo.Println("server closed.")
+
 }
 
 func (s *Server) ParseConfig(conf string) (err error) {
@@ -74,6 +105,15 @@ func (s *Server) Initialize() (err error) {
 }
 
 func (s *Server) Run() (err error) {
+	//when running,the state cannot changed.
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	//set to running
+	s.closed = false
+	core.GsInfo.Println("server runing")
+
+	//run server,apply setting
 	s.applyMultipleProcesses(GsConfig.Workers)
 
 	for {
