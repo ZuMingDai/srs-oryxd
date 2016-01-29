@@ -87,10 +87,20 @@ func (s *Server) Run() (err error) {
 			case syscall.SIGTERM:
 				//SIGTERM
 				q := make(chan error, 1)
-				s.quit <- q
+
+				select {
+				case s.quit <- q:
+				default:
+				}
+
 			}
 		case q := <-s.quit:
-			s.quit <- q
+
+			select {
+			case s.quit <- q:
+			default:
+			}
+
 			s.wg.Wait()
 			core.GsWarn.Println("server quit.")
 			return
