@@ -3,12 +3,13 @@ flowing the srs-oryx https://github.com/ossrs/go-oryx
 
 
 
-Features
+###Features
 
 Supports Multiple Processes.
 Supports Linux, Unix-like and Windows.
 Supports JSON style config file.
 Supports Reload config file.
+Standard godoc,gofmt,gotest and TravisCI.
 [dev] Supports daemon for unix-like os.
 [dev] Support heartbeat to report.
 [dev] Standard godoc, gofmt and gotest.
