@@ -14,7 +14,7 @@ import (
 
 type Server struct {
 	sigs   chan os.Signal
-	quit   chan chan error
+	quit   chan bool
 	wg     sync.WaitGroup
 	logger *simpleLogger
 }
@@ -22,7 +22,7 @@ type Server struct {
 func NewServer() *Server {
 	svr := &Server{
 		sigs:   make(chan os.Signal, 1),
-		quit:   make(chan chan error, 1),
+		quit:   make(chan bool, 1),
 		logger: &simpleLogger{},
 	}
 	GsConfig.Subscribe(svr)
@@ -86,10 +86,9 @@ func (s *Server) Run() (err error) {
 				fallthrough
 			case syscall.SIGTERM:
 				//SIGTERM
-				q := make(chan error, 1)
 
 				select {
-				case s.quit <- q:
+				case s.quit <- true:
 				default:
 				}
 

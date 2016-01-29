@@ -182,7 +182,7 @@ func (pc *Config) Reload(cc *Config) (err error) {
 
 	return
 }
-func configReloadWorker(quit chan chan error) {
+func configReloadWorker(quit chan bool) {
 	signals := make(chan os.Signal, 1)
 	//1:SIGHUP
 	signal.Notify(signals, syscall.Signal(1))
@@ -190,16 +190,9 @@ func configReloadWorker(quit chan chan error) {
 	defer func() {
 		if r := recover(); r != nil {
 			core.GsError.Println("reload panic:", r)
-			q := make(chan error, 1)
-			switch r := r.(type) {
-			case error:
-				q <- r
-			default:
-				q <- fmt.Errorf("%v", r)
-			}
 
 			select {
-			case quit <- q:
+			case quit <- true:
 			default:
 			}
 		}
@@ -214,11 +207,8 @@ func configReloadWorker(quit chan chan error) {
 			if err := reload(); err != nil {
 				core.GsError.Println("quit for reload failed. err is", err)
 
-				q := make(chan error)
-				q <- err
-
 				select {
-				case quit <- q:
+				case quit <- true:
 				default:
 				}
 
