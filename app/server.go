@@ -37,6 +37,8 @@ func NewServer() *Server {
 	return svr
 }
 
+//notify server to stop and wait for cleanup
+//TODO:FIXME:should return a chan to support sync timeout close.
 func (s *Server) Close() {
 	//notify to close
 	GsConfig.Unsubscribe(s)
