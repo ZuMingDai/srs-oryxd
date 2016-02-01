@@ -18,7 +18,7 @@ type WorkerContainer interface {
 	//get the quit channel
 	//worker can fetch the quit signal
 	//or push a quit signal to channel
-	QC() chan bool
+	QC() <-chan bool
 	//notify the container to quit
 	Quit()
 	//fork a new goroutine with work container
@@ -170,7 +170,7 @@ func (s *Server) Run() (err error) {
 }
 
 //interface WorkContainer
-func (s *Server) QC() chan bool {
+func (s *Server) QC() <-chan bool {
 	return s.quit
 }
 
